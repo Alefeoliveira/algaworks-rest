@@ -1,12 +1,14 @@
 package br.com.alefeoliveira.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,10 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
-import br.com.alefeoliveira.domain.exception.EntidadeEmUsoException;
-import br.com.alefeoliveira.domain.exception.EntidadeNaoEncontradaException;
+import br.com.alefeoliveira.api.model.CozinhaDTO;
+import br.com.alefeoliveira.api.util.CozinhaModelAssembler;
 import br.com.alefeoliveira.domain.model.Cozinha;
 import br.com.alefeoliveira.domain.repository.CozinhaRepository;
 import br.com.alefeoliveira.domain.service.CozinhaService;
@@ -36,9 +37,16 @@ public class CozinhaController {
 	@Autowired
 	private CozinhaService service;
 	
+	@Autowired
+	private CozinhaModelAssembler cozinhaModelAssembler;
+	
 	@GetMapping
-	public List<Cozinha> listarCozinha() {
-		return repository.findAll();
+	public Page<CozinhaDTO> listarCozinha(@PageableDefault(size = 10) Pageable pageable) {
+		Page<Cozinha> cozinhasPage = repository.findAll(pageable);
+		
+		List<CozinhaDTO> cozinhaDTO = cozinhaModelAssembler.toCollectionModel(cozinhasPage.getContent());
+		
+		return new PageImpl<>(cozinhaDTO, pageable, cozinhasPage.getTotalElements());
 	}
 	
 	@GetMapping("/por-nome")
