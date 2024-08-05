@@ -14,7 +14,7 @@ import lombok.Data;
 @Data
 public class FotoProduto {
 	
-	@NotNull(groups = Groups.EstadoId.class)
+	@NotNull
 	@Id
 	@Column(name = "produto_id")
 	private Long id;

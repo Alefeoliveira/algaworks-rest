@@ -20,6 +20,7 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.SmartValidator;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -65,11 +66,12 @@ public class RestauranteController {
 	@Autowired
 	private SmartValidator validator;
 	
+	
 	@GetMapping
 	@JsonView(RestauranteView.Resumo.class) 
 	public List<RestauranteDTO> listar() {
-		List<Restaurante> restaurantes = service.buscarTodos(); return
-		util.toCollectionDTO(restaurantes); 
+		List<Restaurante> restaurantes = service.buscarTodos(); 
+		return util.toCollectionDTO(restaurantes); 
 	}
 		
 	 @GetMapping(params = "projecao=apenas-nome")

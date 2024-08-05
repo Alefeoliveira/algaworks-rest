@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import br.com.alefeoliveira.domain.enumerador.StatusPedido;
 import br.com.alefeoliveira.domain.exception.NegocioException;
 import br.com.alefeoliveira.domain.model.Pedido;
+import br.com.alefeoliveira.domain.repository.PedidoRepository;
+import br.com.alefeoliveira.domain.service.EnvioEmailService.Mensagem;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -16,21 +18,26 @@ public class FluxoPedidoService {
 	@Autowired
 	private PedidoService pedidoService;
 	
+	@Autowired
+	private PedidoRepository repo;
+	
 	@Transactional
 	public void confirmar(String codigoPedido) {
 		Pedido pedido = pedidoService.buscarOuFalhar(codigoPedido);
-		
 		pedido.confirmar();
 		pedido.setDataConfirmacao(OffsetDateTime.now());
+		
+		repo.save(pedido);
 	}
 	
+
 
 	@Transactional
 	public void cancelar(String codigoPedido) {
 	    Pedido pedido = pedidoService.buscarOuFalhar(codigoPedido);
-
 	    pedido.cancelar();
-	    pedido.setDataCancelamento(OffsetDateTime.now());
+	    
+	    repo.save(pedido);
 	}
 	
 	@Transactional

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ import br.com.alefeoliveira.domain.model.FotoProduto;
 import br.com.alefeoliveira.domain.model.Produto;
 import br.com.alefeoliveira.domain.service.CatalogoFotoProdutoService;
 import br.com.alefeoliveira.domain.service.FotoStorageService;
+import br.com.alefeoliveira.domain.service.FotoStorageService.FotoRecuperada;
 import br.com.alefeoliveira.domain.service.ProdutoService;
 import jakarta.validation.Valid;
 
@@ -75,7 +77,7 @@ public class RestauranteProdutoFotoController {
 	}
 
 	@GetMapping
-	public ResponseEntity<InputStreamResource> servirFoto(@PathVariable Long restauranteId, 
+	public ResponseEntity<?> servirFoto(@PathVariable Long restauranteId, 
 	        @PathVariable Long produtoId, @RequestHeader(name = "accept") String acceptHeader) throws HttpMediaTypeNotAcceptableException {
 		try {
 			FotoProduto fotoProduto = service.buscarOuFalhar(restauranteId, produtoId);
@@ -85,11 +87,17 @@ public class RestauranteProdutoFotoController {
 			
 			verificarCompatibilidadeMediaType(mediaTypeFoto, mediatypesAceitas);
 			
-			InputStream input = fotoService.recuperar(fotoProduto.getNomeArquivo());
+			FotoRecuperada fotoRecuperada = fotoService.recuperar(fotoProduto.getNomeArquivo());
 			
-			return ResponseEntity.ok()
-					.contentType(MediaType.IMAGE_JPEG)
-					.body(new InputStreamResource(input));
+			if(fotoRecuperada.temUrl()) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+						.header(HttpHeaders.LOCATION, fotoRecuperada.getUrl())
+						.build();
+			}else {
+				return ResponseEntity.ok()
+						.contentType(MediaType.IMAGE_JPEG)
+						.body(new InputStreamResource(fotoRecuperada.getInputStream()));
+			}
 		}catch(EntidadeNaoEncontradaException e) {
 			return ResponseEntity.notFound().build();
 		}

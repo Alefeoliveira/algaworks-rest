@@ -8,8 +8,11 @@ import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.domain.AbstractAggregateRoot;
 
 import br.com.alefeoliveira.domain.enumerador.StatusPedido;
+import br.com.alefeoliveira.domain.event.PedidoCanceladoEvent;
+import br.com.alefeoliveira.domain.event.PedidoConfirmadoEvent;
 import br.com.alefeoliveira.domain.exception.NegocioException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -30,7 +33,8 @@ import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
-public class Pedido {
+@EqualsAndHashCode(callSuper = false)
+public class Pedido extends AbstractAggregateRoot<Pedido> {
 
 	 	@EqualsAndHashCode.Include
 	    @Id
@@ -92,6 +96,8 @@ public class Pedido {
 	    public void confirmar() {
 	    	setStatus(StatusPedido.CONFIRMADO);
 	    	setDataConfirmacao(OffsetDateTime.now());
+	    	
+	    	registerEvent(new PedidoConfirmadoEvent(this));
 	    }
 	    
 	    public void entregar() {
@@ -100,8 +106,10 @@ public class Pedido {
 	    }
 	    
 	    public void cancelar() {
-	    	setStatus(StatusPedido.CANCELADO);
-	    	setDataCancelamento(OffsetDateTime.now());
+	        setStatus(StatusPedido.CANCELADO);
+	        setDataCancelamento(OffsetDateTime.now());
+	        
+	        registerEvent(new PedidoCanceladoEvent(this));
 	    }
 	    
 	    private void setStatus(StatusPedido novoStatus) {
