@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
@@ -24,7 +27,8 @@ import lombok.EqualsAndHashCode;
 //@JsonRootName("cozinha")
 @Entity
 @Data
-public class Cozinha {
+@Relation(collectionRelation = "cozinhas")
+public class Cozinha extends RepresentationModel<Cozinha> {
 	
 	//@NotNull(groups = Groups.CozinhaId.class)
 	@Id

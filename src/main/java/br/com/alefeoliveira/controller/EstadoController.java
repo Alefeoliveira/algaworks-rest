@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +44,15 @@ public class EstadoController {
 	@GetMapping("/{id}")
 	public Estado buscar(@PathVariable("id") Long id) {
 		return service.buscar(id);
+	}
+	
+	@PostMapping
+	public Estado salvar(@RequestBody @Valid Estado estado) {
+		try {
+			return service.salvar(estado);
+		}catch(EstadoNaoEncontradaException e) {
+			throw new NegocioException(e.getMessage(), e);
+		}
 	}
 	
 	@PutMapping("/{id}")
