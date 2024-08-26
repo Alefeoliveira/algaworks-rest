@@ -2,6 +2,8 @@ package br.com.alefeoliveira.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,6 +34,8 @@ import jakarta.validation.Valid;
 @RequestMapping(value = "/cozinhas")
 public class CozinhaController {
 	
+	private static final Logger logger = LoggerFactory.getLogger(CozinhaController.class);
+	
 	@Autowired
 	private CozinhaRepository repository;
 	
@@ -46,6 +50,7 @@ public class CozinhaController {
 	
 	@GetMapping
 	public PagedModel<CozinhaDTO> listarCozinha(@PageableDefault(size = 10) Pageable pageable) {
+		logger.info("Listando cozinhas");
 		Page<Cozinha> cozinhasPage = repository.findAll(pageable);
 		
 		PagedModel<CozinhaDTO> cozinhasPagedModel = pagedResourcesAssembler
